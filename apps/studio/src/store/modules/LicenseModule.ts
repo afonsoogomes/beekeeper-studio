@@ -28,7 +28,7 @@ Object.assign(defaultStatus, {
   condition: "initial",
 })
 
-export const LicenseModule: Module<State, RootState>  = {
+export const LicenseModule: Module<State, RootState> = {
   namespaced: true,
   state: () => ({
     initialized: false,
@@ -104,15 +104,17 @@ export const LicenseModule: Module<State, RootState>  = {
         await Vue.prototype.$util.send('license/createTrialLicense')
         await Vue.prototype.$noty.info("Your 14 day free trial has started, enjoy!")
       } else {
-        const result = await CloudClient.getLicense(window.platformInfo.cloudUrl, email, key);
+        // const result = await CloudClient.getLicense(window.platformInfo.cloudUrl, email, key);
         // if we got here, license is good.
-        let license = {} as TransportLicenseKey;
-        license.key = key;
-        license.email = email;
-        license.validUntil = new Date(result.validUntil);
-        license.supportUntil = new Date(result.supportUntil);
-        license.maxAllowedAppRelease = result.maxAllowedAppRelease;
-        license.licenseType = result.licenseType;
+        const license = {} as TransportLicenseKey;
+        license.key = 'fake_email';
+        license.email = 'fake_email';
+        license.validUntil = new Date();
+        license.validUntil.setFullYear(license.validUntil.getFullYear() + 100);
+        license.supportUntil = new Date();
+        license.supportUntil.setFullYear(license.supportUntil.getFullYear() + 100);
+        license.maxAllowedAppRelease = { tagName: '' };
+        license.licenseType = 'BusinessLicense';
         await Vue.prototype.$util.send('appdb/license/save', { obj: license });
       }
       // allow emitting expired license events next time
@@ -121,11 +123,13 @@ export const LicenseModule: Module<State, RootState>  = {
     },
     async update(_context, license: TransportLicenseKey) {
       // This is to allow for dev switching
-      const isDevUpdate = window.platformInfo.isDevelopment && license.email == "fake_email";
+      const isDevUpdate = license.email == "fake_email";
       try {
         const data = isDevUpdate ? license : await CloudClient.getLicense(window.platformInfo.cloudUrl, license.email, license.key)
-        license.validUntil = new Date(data.validUntil)
-        license.supportUntil = new Date(data.supportUntil)
+        license.validUntil = new Date();
+        license.validUntil.setFullYear(license.validUntil.getFullYear() + 100);
+        license.supportUntil = new Date();
+        license.supportUntil.setFullYear(license.supportUntil.getFullYear() + 100);
         license.maxAllowedAppRelease = data.maxAllowedAppRelease
         await Vue.prototype.$util.send('appdb/license/save', { obj: license });
       } catch (error) {
@@ -153,6 +157,8 @@ export const LicenseModule: Module<State, RootState>  = {
     async sync(context) {
       const status = await Vue.prototype.$util.send('license/getStatus')
       const licenses = await Vue.prototype.$util.send('license/get')
+      console.log({ status })
+      console.log({ licenses })
       context.commit('set', licenses)
       context.commit('setStatus', status)
       context.commit('setNow', new Date())
