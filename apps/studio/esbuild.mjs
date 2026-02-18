@@ -95,7 +95,9 @@ const commonArgs = {
   sourcemap: true,
   minify: false,
   define: {
-    'process.env.NODE_ENV': env
+    'process.env.NODE_ENV': env,
+    // BKS_PREMIUM_BUILD=1 at build time bakes in "always premium, never expire"
+    'process.env.BKS_PREMIUM_BUILD': JSON.stringify(process.env.BKS_PREMIUM_BUILD || '')
   }
 }
 

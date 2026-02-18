@@ -5,6 +5,14 @@ import { TransportLicenseKey } from "@/common/transport";
 import { LicenseStatus } from "@/lib/license";
 import { InstallationId } from "@/common/appdb/models/installation_id";
 
+/** When set at build time (BKS_PREMIUM_BUILD=1), the app is always premium and never expires. */
+function createPremiumStatus(): LicenseStatus {
+  const status = new LicenseStatus();
+  status.edition = "ultimate";
+  status.condition = ["Premium build - no expiration"];
+  return status;
+}
+
 export interface ILicenseHandlers {
   "license/createTrialLicense": () => Promise<void>;
   "license/getStatus": () => Promise<LicenseStatus>;
@@ -25,6 +33,19 @@ export const LicenseHandlers: ILicenseHandlers = {
     }
   },
   "license/getStatus": async function () {
+    // Premium build: always ultimate, never expires (set BKS_PREMIUM_BUILD=1 at build time)
+    if (process.env.BKS_PREMIUM_BUILD === "1") {
+      const status = createPremiumStatus();
+      return {
+        ...status,
+        isUltimate: true,
+        isCommunity: false,
+        isTrial: false,
+        isValidDateExpired: false,
+        isSupportDateExpired: false,
+        maxAllowedVersion: status.maxAllowedVersion,
+      };
+    }
     // If someone has a file-based license, that takes
     // priority over ALL other licenses
     const offline = OfflineLicense.load()
