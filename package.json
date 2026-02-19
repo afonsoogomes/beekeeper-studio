@@ -11,7 +11,7 @@
   "scripts": {
     "bks:build": "yarn lib:build && yarn workspace beekeeper-studio electron:build",
     "bks:build:mac": "yarn lib:build && yarn workspace beekeeper-studio electron:build:mac",
-    "bks:build:linux": "yarn lib:build && yarn workspace beekeeper-studio electron:build --linux",
+    "bks:build:linux": "yarn lib:build && yarn workspace beekeeper-studio electron:build --linux deb",
     "bks:build:win": "yarn lib:build && yarn workspace beekeeper-studio electron:build --win",
     "bks:dev": "yarn lib:build && yarn workspace beekeeper-studio electron:serve",
     "bks:config:build": "yarn workspace beekeeper-studio config:build",

@@ -33,35 +33,14 @@ export const LicenseHandlers: ILicenseHandlers = {
     }
   },
   "license/getStatus": async function () {
-    // Premium build: always ultimate, never expires (set BKS_PREMIUM_BUILD=1 at build time)
-    if (process.env.BKS_PREMIUM_BUILD === "1") {
-      const status = createPremiumStatus();
-      return {
-        ...status,
-        isUltimate: true,
-        isCommunity: false,
-        isTrial: false,
-        isValidDateExpired: false,
-        isSupportDateExpired: false,
-        maxAllowedVersion: status.maxAllowedVersion,
-      };
-    }
-    // If someone has a file-based license, that takes
-    // priority over ALL other licenses
-    const offline = OfflineLicense.load()
-    let status = null
-    if (offline && offline.isValid) {
-      status = offline.toLicenseStatus()
-    } else {
-      status = await LicenseKey.getLicenseStatus();
-    }
+    const status = createPremiumStatus();
     return {
       ...status,
-      isUltimate: status.isUltimate,
-      isCommunity: status.isCommunity,
-      isTrial: status.isTrial,
-      isValidDateExpired: status.isValidDateExpired,
-      isSupportDateExpired: status.isSupportDateExpired,
+      isUltimate: true,
+      isCommunity: false,
+      isTrial: false,
+      isValidDateExpired: false,
+      isSupportDateExpired: false,
       maxAllowedVersion: status.maxAllowedVersion,
     };
   },
