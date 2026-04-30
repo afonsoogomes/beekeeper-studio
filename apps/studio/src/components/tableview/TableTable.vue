@@ -412,7 +412,7 @@ export default Vue.extend({
       return _.isEmpty(this.data);
     },
     isCassandra() {
-      return this.connectionType === 'cassandra'
+      return ['cassandra', 'scylladb'].includes(this.connectionType)
     },
     queryDialect() {
       return this.dialectData?.queryDialectOverride ?? this.dialect;
@@ -971,7 +971,8 @@ export default Vue.extend({
     },
     deleteTableSelection(_e: Event, range?: RangeComponent) {
       if (!this.focusingTable() || !this.editable) return
-      const rows = range ? range.getRows() : this.getSelectedRows()
+      const selectedRows = this.getSelectedRows()
+      const rows = selectedRows.length > 0 ? selectedRows : (range ? range.getRows() : [])
       this.addRowsToPendingDeletes(rows);
     },
     headerFormatter(_cell, formatterParams) {
@@ -1107,6 +1108,7 @@ export default Vue.extend({
     },
     rowActionsMenu(range: RangeComponent) {
       const rowRangeLabel = `${range.getTopEdge() + 1} - ${range.getBottomEdge() + 1}`
+      const selectedRowsCount = this.getSelectedRows().length
       return [
         {
           label:
@@ -1118,7 +1120,9 @@ export default Vue.extend({
         },
         {
           label:
-            range.getTopEdge() === range.getBottomEdge()
+            selectedRowsCount > 1
+              ? createMenuItem(`Delete ${selectedRowsCount} selected rows`, "Delete")
+              : range.getTopEdge() === range.getBottomEdge()
               ? createMenuItem("Delete row", "Delete")
               : createMenuItem(`Delete rows ${rowRangeLabel}`, "Delete"),
           action: () => {
@@ -1129,7 +1133,13 @@ export default Vue.extend({
         },
         { separator: true },
         {
-          label: createMenuItem('See details'),
+          label: createMenuItem(
+            'See details',
+            this.$bksConfig.getKeybindings(
+              'context-menu',
+              'general.jsonViewerSidebar'
+            )
+          ),
           action: () => {
             this.trigger(AppEvent.selectSecondarySidebarTab, 'json-viewer')
             this.trigger(AppEvent.toggleSecondarySidebar, true)

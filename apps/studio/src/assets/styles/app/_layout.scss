@@ -30,7 +30,9 @@ i {
   font-weight: bold;
   text-transform: uppercase;
   font-size: 80%;
-  letter-spacing: 0.05rem;
+  // NOTE: This was probably ok when we still use Roboto as a font.
+  // Now we use system font. So at least in mac, this isn't good.
+  // letter-spacing: 0.05rem;
 }
 .noselect {
   @include noselect;
@@ -752,16 +754,24 @@ input[type=file] {
 
 .alert {
   display: flex;
+  align-items: flex-start;
   border-radius: 6px;
   padding: 0.75rem 1rem;
   background: rgba($theme-base, 0.035);
   margin: 0.5rem 0;
   font-size: 0.85rem;
-  line-height: 24px;
+  line-height: 1.2rem;
   > i {
     font-size: 18px;
-    line-height: 24px;
+    line-height: 1;
     margin-right: 1rem;
+  }
+  code {
+    background: rgba($theme-base, 0.08);
+    margin: 0 0.25rem;
+    padding: 0.15rem 0.4rem;
+    border-radius: 3px;
+    font-size: 0.8rem;
   }
   ul {
     margin: 0.35rem 0;
@@ -779,11 +789,11 @@ input[type=file] {
     align-items: flex-start;
     justify-content: flex-start;
     flex-grow: 1;
-    line-height: 24px;
+    line-height: 1.2rem;
   }
   .alert-footer {
     display: flex;
-    line-height: 24px;
+    line-height: 1.2rem;
     height: 26px; // button height
   }
 }
