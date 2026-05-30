@@ -20,6 +20,7 @@
     "test:e2e:smoke": "cross-env TEST_MODE=1 yarn playwright test --config=playwright.smoke.config.ts",
     "lint": "eslint src src-commercial tests --ext .ts,.tsx,.vue,.js",
     "electron:build": "yarn build && yarn electron-builder --config ./electron-builder-config.js",
+    "electron:build:mac": "BKS_PREMIUM_BUILD=1 yarn build && yarn electron-builder --config ./electron-builder-config.js --mac",
     "electron:serve": "concurrently --kill-others-on-fail -c blue,green -n esbuild,vite \"yarn dev:esbuild\" \"yarn dev:vite\"",
     "config:build": "CLI_MODE=1 tsx ./src/config/typesGenerator.ts",
     "postinstall": "electron-builder install-app-deps",
